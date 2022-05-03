@@ -11,6 +11,7 @@ var axios= require("axios")
 //Fiware Configuration
 const fiware_url=process.env.FIWARE_SERVER_URL || undefined
 const fiware_node_id=process.env.FIWARE_NODE_ID || undefined
+//const fiware_node_id="urn:ngsi-ld:Alert:BOSH:feed-trigger-";
 
 //Line 2 configuration
 const LINE_2_URL=process.env.LINE_2_URL || undefined

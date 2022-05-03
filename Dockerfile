@@ -16,6 +16,8 @@ RUN npm install
 
 EXPOSE 4005 
 
+RUN npm install typescript
+
 RUN npm install -g ts-node
 
 CMD [ "ts-node", "./upmclient.ts" ]
