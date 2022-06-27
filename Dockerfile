@@ -8,7 +8,7 @@ COPY . .
 
 # COPY ./client.ts ./
 
-COPY ./upmclient.ts ./
+COPY ./L5.ts ./
 
 COPY ./Logger.ts ./
 
@@ -20,4 +20,4 @@ RUN npm install typescript
 
 RUN npm install -g ts-node
 
-CMD [ "ts-node", "./upmclient.ts" ]
+CMD [ "ts-node", "./L5.ts" ]

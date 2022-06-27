@@ -5,24 +5,24 @@ import { trytypes } from './trytypes'
 
 var trayType="NA";
 var default_index = 0
+
 // const nodeId_TypeNoCur = "ns=4;s=\"DataHandling\".\"TypeNoCur\"";
 const dateIssued ="https://smart-data-models.github.io/data-models/terms.jsonld#/definitions/dateIssued"
 var axios= require("axios")
 //Fiware Configuration
-const fiware_url=process.env.FIWARE_SERVER_URL || undefined
-const fiware_node_id=process.env.FIWARE_NODE_ID || undefined
-//const fiware_node_id="urn:ngsi-ld:Alert:BOSH:feed-trigger-";
+const fiware_url="http://localhost:1026"
+const fiware_node_id="urn:ngsi-ld:Alert:BOSH:feed-trigger-"
+
 
 //Line 2 configuration
-const LINE_2_URL=process.env.LINE_2_URL || undefined
-const TypeNoCur_plc_nodeid_L2=process.env.TypeNoCur_NODEID_L2 || undefined
-const BlisterEntry_plc_nodeid_L2=process.env.BlisterEntry_NODEID_L2  || undefined
+const LINE_2_URL="opc.tcp://localhost:4334"
+const TypeNoCur_plc_nodeid_L2="ns=1;s=DataHandling.TypeNoCur"
+const BlisterEntry_plc_nodeid_L2="ns=1;s=Station090.BlisterEntry"
 
 //Line 5 configuration
-const LINE_5_URL=process.env.LINE_5_URL || undefined
-const TypeNoCur_plc_nodeid_L5=process.env.TypeNoCur_NODEID_L5 || undefined
-const BlisterEntry_plc_nodeid_L5=process.env.BlisterEntry_NODEID_L5|| undefined
-
+const LINE_5_URL="opc.tcp://localhost:4334"
+const TypeNoCur_plc_nodeid_L5="ns=1;s=DataHandling.TypeNoCur2"
+const BlisterEntry_plc_nodeid_L5="ns=1;s=Station090.BlisterEntry2"
 // interval of subscription checks
 const publishing_interval = 1000
 
@@ -48,7 +48,7 @@ var notification_body ={
             
       alertSource: {
         type: "Relationship",
-        object: ''
+        object: "urn:ngsi-ld:Asset:BOSH:LS2"
     },
     "@context": [
        "https://smartdatamodels.org/context.jsonld",
@@ -79,42 +79,42 @@ const serverConnectionConfiguration={
 async function init(){
 
     if(fiware_node_id == undefined){
-        Logger.failure(`Undefined fiware_node_id. Actual value =${fiware_node_id}. Check environment configuration`)
+        Logger.failure(`undefined fiware_node_id. Actual value =${fiware_node_id}. Check environment configuration`)
         throw new Error();
     }
     if(fiware_url == undefined){
-        const message=`Undefined fiware_url. Actual value =${fiware_url}. Check environment configuration`
+        const message=`undefined fiware_url. Actual value =${fiware_url}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
     if(LINE_2_URL == undefined){
-        const message=`Undefined LINE_2_URL. Actual value =${LINE_2_URL}. Check environment configuration`
+        const message=`undefined LINE_2_URL. Actual value =${LINE_2_URL}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
     if(LINE_5_URL == undefined){
-        const message=`Undefined LINE_5_URL. Actual value =${LINE_5_URL}. Check environment configuration`
+        const message=`undefined LINE_5_URL. Actual value =${LINE_5_URL}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
     if(TypeNoCur_plc_nodeid_L2 == undefined){
-        const message=`Undefined TypeNoCur_plc_nodeid_L2. Actual value =${TypeNoCur_plc_nodeid_L2}. Check environment configuration`
+        const message=`undefined TypeNoCur_plc_nodeid_L2. Actual value =${TypeNoCur_plc_nodeid_L2}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
     if(BlisterEntry_plc_nodeid_L2 == undefined){
-        const message=`Undefined BlisterEntry_plc_nodeid_L2. Actual value =${BlisterEntry_plc_nodeid_L2}. Check environment configuration`
+        const message=`undefined BlisterEntry_plc_nodeid_L2. Actual value =${BlisterEntry_plc_nodeid_L2}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
 
     if(TypeNoCur_plc_nodeid_L5 == undefined){
-        const message=`Undefined TypeNoCur_plc_nodeid_L5. Actual value =${TypeNoCur_plc_nodeid_L5}. Check environment configuration`
+        const message=`undefined TypeNoCur_plc_nodeid_L5. Actual value =${TypeNoCur_plc_nodeid_L5}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
     if(BlisterEntry_plc_nodeid_L5 == undefined){
-        const message=`Undefined BlisterEntry_plc_nodeid_L5. Actual value =${BlisterEntry_plc_nodeid_L5}. Check environment configuration`
+        const message=`undefined BlisterEntry_plc_nodeid_L5. Actual value =${BlisterEntry_plc_nodeid_L5}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
@@ -138,7 +138,7 @@ async function init(){
         }else if(trytypes.TypeC.indexOf(dataValue_TypeNoCur.value.value.toString()) == -1){
             trayType = 'C'
         }else{
-            Logger.warn(`L2 - tray type not defined. Given ${dataValue_TypeNoCur.value.value.toString()}`)
+            Logger.warn(`L2 - try type not defined. Given ${dataValue_TypeNoCur.value.value.toString()}`)
         }       
     });
     
@@ -148,10 +148,10 @@ async function init(){
             default_index=default_index+1;
             notification_body.id=`${fiware_node_id}${default_index}`
             notification_body.description.value=trayType
-            notification_body.alertSource.object='urn:ngsi-ld:Asset:BOSH:LS2'
+            notification_body.alertSource.object='urn:ngsi-ld:Asset:BOS:LS2'
             postRecord(notification_body)
            }else{
-            Logger.debug("No tray needed at line L2")
+            Logger.debug("BlisterEntry at line L2 is not needed")
         }         
     });
     //Line 5 setup
@@ -168,7 +168,7 @@ async function init(){
         }else if(trytypes.TypeC.indexOf(dataValue_TypeNoCur.value.value.toString()) == -1){
             trayType = 'C'
         }else{
-            Logger.warn(`L5 - tray type not defined. Given ${dataValue_TypeNoCur.value.value.toString()}`)
+            Logger.warn(`L5 - try type not defined. Given ${dataValue_TypeNoCur.value.value.toString()}`)
         }       
     });
     
@@ -178,10 +178,10 @@ async function init(){
             default_index=default_index+1;
             notification_body.id=`${fiware_node_id}${default_index}`
             notification_body.description.value=trayType
-            notification_body.alertSource.object='urn:ngsi-ld:Asset:BOSH:LS5'
+            notification_body.alertSource.object='urn:ngsi-ld:Asset:BOS:LS5'
             postRecord(notification_body)
            }else{
-            Logger.debug("No tray needed at line L5")
+            Logger.debug("BlisterEntry at line L5 is not needed")
         }         
     });
 
@@ -194,12 +194,12 @@ async function connectoToPLC(url:any){
         await  client.connect(url)
         return client
     } catch (error) {
-        Logger.failure(`Can not connect to PLC ${url} --- ${JSON.stringify(error)}`)
+        Logger.failure(`Cant connect to PLC ${url} --- ${JSON.stringify(error)}`)
     }
 }
 
 async function getLastRecordOfType(record_type:any){
-    Logger.debug(`Finding record of type ${record_type}`)
+    Logger.debug(`finding record of type ${record_type}`)
     try {
         var result = await axios.get(`${fiware_url}/ngsi-ld/v1/entities?type=${record_type}`).then((response:any)=>response.data)
     if(result.length != 0 ){
@@ -208,20 +208,20 @@ async function getLastRecordOfType(record_type:any){
             .map((l:string)=>parseInt(l)).sort( (a: number,b: number) =>a - b )
             .slice(-1)[0]
 
-    Logger.debug(`Last notification id was  ${idStartNumber}`)
+    Logger.debug(`last notification id was  ${idStartNumber}`)
       return parseInt(idStartNumber)
     }else{
-        Logger.debug(`There is no entity matching with ${record_type}`)
+        Logger.debug(`there is no entity matching with ${record_type}`)
         return 0
     } 
     } catch (error) {
-        Logger.failure(`EXCEPTION GIVEN - Can not get getLastRecordOfType  ${record_type } - ${JSON.stringify(error)}`)
+        Logger.failure(`EXCEPTION GIVEN - cant get getLastRecordOfType  ${record_type } - ${JSON.stringify(error)}`)
         return 0
     }
 }
 
 async function createSubscription(client:any,node_id:any) {
-    Logger.debug(`Creating subscription for ${node_id}...`);
+    Logger.debug(`creating subscription for ${node_id}...`);
     const session = await client.createSession();
     const subscription = await  session.createSubscription2({
         requestedPublishingInterval: 1000,
@@ -233,9 +233,9 @@ async function createSubscription(client:any,node_id:any) {
     });
 
     subscription
-        .on("Started", () => console.log("Subscription started - subscriptionId=", subscription.subscriptionId))
-        .on("Keepalive", () => Logger.debug(`keep alive ${node_id}`))
-        .on("Terminated", () => console.log("Subscription terminated"));
+        .on("started", () => console.log("subscription started - subscriptionId=", subscription.subscriptionId))
+        .on("keepalive", () => Logger.debug(`keep alive ${node_id}`))
+        .on("terminated", () => console.log("subscription terminated"));
     const itemToMonitor={
         nodeId:node_id,
         attributeId: AttributeIds.Value
@@ -254,7 +254,7 @@ async function readVariable(client:any,node:any){
       nodeId: node,
     };
     const dataValue =  await session.read(nodeToRead, maxAge);
-    console.log(" Value " , dataValue.toString());
+    console.log(" value " , dataValue.toString());
 }
 
 async function browse(client:any){

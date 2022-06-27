@@ -13,11 +13,6 @@ const fiware_url=process.env.FIWARE_SERVER_URL || undefined
 const fiware_node_id=process.env.FIWARE_NODE_ID || undefined
 //const fiware_node_id="urn:ngsi-ld:Alert:BOSH:feed-trigger-";
 
-//Line 2 configuration
-const LINE_2_URL=process.env.LINE_2_URL || undefined
-const TypeNoCur_plc_nodeid_L2=process.env.TypeNoCur_NODEID_L2 || undefined
-const BlisterEntry_plc_nodeid_L2=process.env.BlisterEntry_NODEID_L2  || undefined
-
 //Line 5 configuration
 const LINE_5_URL=process.env.LINE_5_URL || undefined
 const TypeNoCur_plc_nodeid_L5=process.env.TypeNoCur_NODEID_L5 || undefined
@@ -87,26 +82,15 @@ async function init(){
         Logger.failure(message)
         throw new Error(message);
     }
-    if(LINE_2_URL == undefined){
-        const message=`Undefined LINE_2_URL. Actual value =${LINE_2_URL}. Check environment configuration`
-        Logger.failure(message)
-        throw new Error(message);
-    }
+    
+    
     if(LINE_5_URL == undefined){
         const message=`Undefined LINE_5_URL. Actual value =${LINE_5_URL}. Check environment configuration`
         Logger.failure(message)
         throw new Error(message);
     }
-    if(TypeNoCur_plc_nodeid_L2 == undefined){
-        const message=`Undefined TypeNoCur_plc_nodeid_L2. Actual value =${TypeNoCur_plc_nodeid_L2}. Check environment configuration`
-        Logger.failure(message)
-        throw new Error(message);
-    }
-    if(BlisterEntry_plc_nodeid_L2 == undefined){
-        const message=`Undefined BlisterEntry_plc_nodeid_L2. Actual value =${BlisterEntry_plc_nodeid_L2}. Check environment configuration`
-        Logger.failure(message)
-        throw new Error(message);
-    }
+    
+    
 
     if(TypeNoCur_plc_nodeid_L5 == undefined){
         const message=`Undefined TypeNoCur_plc_nodeid_L5. Actual value =${TypeNoCur_plc_nodeid_L5}. Check environment configuration`
@@ -124,36 +108,7 @@ async function init(){
         default_index = entity_id
     }
 
-    //Line 2 setup
-    const l2_client = await connectoToPLC(LINE_2_URL)
-    const TypeNoCur_subscription_L2 = await createSubscription(l2_client,TypeNoCur_plc_nodeid_L2)
-    const BlisterEntry_subscription_L2 = await createSubscription(l2_client,BlisterEntry_plc_nodeid_L2)
-
-    TypeNoCur_subscription_L2.on("changed",  async (dataValue_TypeNoCur: DataValue) => {
-        Logger.debug(`Monitoring TypeNoCur on line 2. Current value = ${dataValue_TypeNoCur.value.value.toString()}`)
-        if(trytypes.TypeA.indexOf(dataValue_TypeNoCur.value.value.toString()) != -1){
-            trayType = 'A'
-        }else if(trytypes.TypeB.indexOf(dataValue_TypeNoCur.value.value.toString()) == -1){
-            trayType = 'B'
-        }else if(trytypes.TypeC.indexOf(dataValue_TypeNoCur.value.value.toString()) == -1){
-            trayType = 'C'
-        }else{
-            Logger.warn(`L2 - tray type not defined. Given ${dataValue_TypeNoCur.value.value.toString()}`)
-        }       
-    });
     
-    BlisterEntry_subscription_L2.on("changed",  async (dataValue_BlisterEntry: DataValue) => {
-        Logger.debug(`Monitoring BlisterEntry on line 2. Current value = ${dataValue_BlisterEntry.value.value.toString()}`)
-        if(dataValue_BlisterEntry.value.value.toString() == "false"){
-            default_index=default_index+1;
-            notification_body.id=`${fiware_node_id}${default_index}`
-            notification_body.description.value=trayType
-            notification_body.alertSource.object='urn:ngsi-ld:Asset:BOSH:LS2'
-            postRecord(notification_body)
-           }else{
-            Logger.debug("No tray needed at line L2")
-        }         
-    });
     //Line 5 setup
     const l5_client = await connectoToPLC(LINE_5_URL)
     const TypeNoCur_subscription_L5 = await createSubscription(l5_client,TypeNoCur_plc_nodeid_L5)
