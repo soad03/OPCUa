@@ -1,32 +1,30 @@
 {
-  "name": "node-opcua-sample",
-  "version": "0.4.5",
-  "description": "Simple OPCUA  client using node-opcua",
-  "main": "simple_client.js",
+  "name": "arcelik",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tsc": "tsc",
+    "dev": "ts-node-dev ./src/index.ts",
+    "dev-test": "mocha -b -g \"OPCUaClient Tests - Test server\"",
+    "prod-test": "mocha -b -g \"Unit test with production server\"",
+    "build": "rimraf ./build && tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/erossignon/node-opcua-sample.git"
-  },
-  "keywords": [
-    "opcua"
-  ],
-  "author": "Etienne Rossignon",
-  "license": "MIT",
-  "dependencies": {
-    "@types/node": "^14.11.2",
-    "async": "^3.2.3",
-    "axios": "^0.21.4",
-    "node-opcua": "^2.68.0",
-    "ts-node": "^3.0.4"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "@types/axios": "^0.14.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node-schedule": "^2.1.0",
+    "mocha": "^10.0.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "node-opcua-client": "^2.79.0",
+    "node-schedule": "^2.1.0",
+    "ts-node-dev": "2.0.0",
+    "rimraf": "^3.0.2"
   }
 }

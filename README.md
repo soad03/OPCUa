@@ -3,18 +3,18 @@
 
 OPCUa Client with scheduled operations
 
+- -  -
 ## Description
 
-Usin OPCUa client, this software read some opcua server variables, and send the value via Fiware context broker. This job is scheduled to be execute every hour.
+Using a JavaScript OPCUa client implementation, this application can read OPCUa server variables. 
 
-- -  -
+With the variables values, the application build Fiware messages and  send the value via Fiware context broker. This job is scheduled to be execute every hour.
+
 
 ## Table of contents
 
 * [Prerequsites](#prerequsites)
-* [Configuration](#configuration)
-    * [OPCUa client](#client)
-    * [Fiware](#fiware)
+* [Configurations](#configurations)
 * [Testing](#testing)
 * [Deployment](#deployment)
     * [Standalone](#standalone)
@@ -27,38 +27,46 @@ Usin OPCUa client, this software read some opcua server variables, and send the 
 
 [node.js](https://nodejs.org/en/) and npm installed, and minimal command line knowledge.
 
-## Configuration
+## Configurations
 
-There are two configurations
+The application will read a configuration file. This file consists in a list of servers, and each server with a list of nodes to read.
 
-## *Client*
+There are two configurations files, one for test and other for production environment.
 
-The client will read the [client configuration json file](./OPCUaClientConfig.json) who is holding the connection information. This configuration allows to connect with multiple servers wit more or one variable to read
+* Configuation file to testint environment [here](./build/OPCUaClientConfigTest.js)
 
-## *Fiware*
+* Configuation file to production environment [here](./build/OPCUaClientConfigProd.js)
 
-The [environment file](./ENV) holds the configuration to connect with fiware.
+
+By deafault, the [default](./src/environment.ts) environmnet configuration is test. To mofify this configuration, set the environment variables at system level or change the [environmnet.ts](./src/environment.ts) file content.
 
 ## Testing
+To test this application, go to [this repository](https://gitlab.lst.tfo.upm.es/shop4cf/node-red-opc-ua-server) and deploy node-red.
 
-To run the tests, execute ``npm run test``
+Once node red is running, run the tests executing ``npm run devtest`` to test the application against the depoyed node-red server.
+
+**note** To test the application against the production server, run ``npm run prodtest``
+
 
 ## Deployment
 
-There are two options to use this tool
+There are two options to use this application:
 
 ## *Standalone*
 
 * Open a terminal at package.json level 
-* execute ``npm run dev``
+* Execute ``npm run dev`` to development purposes.
+* To copile to js code, use the script ``npm run build``. This copile the typescipt to javascript into build directory
 
 
 ## *Docker*
 
-To run this code inside a docker container:
+To run this apllication inside a docker container:
 
 * Build the image using ``docker build -t arcelikclient .``
-* Create a container using ``docker run -d arcelikclient  --env-file ./ENV``
+* Create a container using ``docker run -d --env-file .env arcelikclient`` for production environment (if no env file is provided, the apllication run with test configuration)
+* To perfom the test wiht docker in test environment, execute `` docker build -t arcelikclient . --target devtest . --no-cache --progress=plain``
+* To perfom the test wiht docker in prod environment, execute `` docker build -t arcelikclient . --target prodtest . --no-cache --progress=plain`` 
 
 
 ## Support

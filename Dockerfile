@@ -1,23 +1,36 @@
-FROM node:10
+FROM node:16-alpine as buildstage
 
-WORKDIR /usr
+WORKDIR /usr/src/app
 
-COPY package.json ./
+COPY package*.json ./
 
-COPY . .
-
-# COPY ./client.ts ./
-
-COPY ./upmclient.ts ./
-
-COPY ./Logger.ts ./
+RUN apk add --update openssl
 
 RUN npm install
 
-EXPOSE 4005 
+COPY . .
 
-RUN npm install typescript
+RUN npm run build
 
-RUN npm install -g ts-node
+FROM buildstage as devtest   
 
-CMD [ "ts-node", "./upmclient.ts" ]
+RUN npm run dev-test
+
+FROM buildstage as prodtest   
+
+RUN npm run prod-test
+
+FROM node:16-alpine as deploy
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+RUN apk add --update openssl
+
+COPY --from=buildstage /usr/src/app/build .
+
+CMD ["node","index.js"]
+
